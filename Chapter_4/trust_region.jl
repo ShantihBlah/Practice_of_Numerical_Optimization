@@ -14,7 +14,7 @@ function trustRegion(object_function::Function, diff_function::Function, hessian
         B_k = hessian_function(x_vec)
 
         # p_k = cauchyPointCalculation(g_k, delta_k, B_k)
-        p_k = dogleg(g_k, B_k, 1.1)
+        p_k = dogleg(g_k, B_k, delta_k)
 
         m_0 = resolveMk(f_k, g_k, B_k, zero_vec)
         m_k = resolveMk(f_k, g_k, B_k, p_k)
@@ -48,10 +48,31 @@ function cauchyPointCalculation(g_k::Vector, delta_k::Float64, B_k::Matrix)
     return p_k
 end
 
-function dogleg(g_k::Vector, B_k::Matrix, tau_k::Float64)
+function dogleg(g_k::Vector, B_k::Matrix, delta_k::Float64)
     sec_item = Transpose(g_k)*B_k*g_k
     p_U = - (Transpose(g_k)*g_k / sec_item) * g_k
     p_B = - inv(B_k) * g_k
+    # Solve tau
+    tau_k = 2.
+    if (norm(p_B) > delta_k)
+        # tau_k = 1.1
+        # quad_no_neg: 0.25*(b^2-4*ac)
+        quad_no_neg = (Transpose(p_B-p_U)*p_U)^2 - norm(p_B-p_U)^2*(norm(p_U)^2-delta_k^2)
+        # tau should be in (1,2]
+        if (quad_no_neg > 0)
+            tau_k = (-Transpose(p_B-p_U)*p_U + sqrt(quad_no_neg)) / norm(p_B-p_U)^2 + 1
+            if tau_k>2
+                tau_k = 2
+            end
+        # tau should be in (0,1]
+        else
+            tau_k = delta_k/norm(p_U)
+            if tau_k>1
+                tau_k = 1
+            end
+        end
+    end
+    # Solve p_tau
     p_tau = tau_k*p_U
     if (tau_k>1 && tau_k<=2)
         p_tau = p_U + (tau_k-1)*(p_B-p_U)
