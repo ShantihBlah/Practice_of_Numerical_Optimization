@@ -19,6 +19,7 @@ function trustRegion(object_function::Function, diff_function::Function, hessian
         m_0 = resolveMk(f_k, g_k, B_k, zero_vec)
         m_k = resolveMk(f_k, g_k, B_k, p_k)
         rho_k = (object_function(x_vec)-object_function(x_vec+p_k)) / (m_0 - m_k)
+        println("rho_k: ", rho_k)
 
         if (rho_k < 0.25)
             delta_k = 0.25 * delta_k
@@ -72,6 +73,7 @@ function dogleg(g_k::Vector, B_k::Matrix, delta_k::Float64)
             end
         end
     end
+    # println("tau_k: ", tau_k)
     # Solve p_tau
     p_tau = tau_k*p_U
     if (tau_k>1 && tau_k<=2)

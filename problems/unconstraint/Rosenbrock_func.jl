@@ -1,5 +1,8 @@
-using LinearAlgebra
+#
+#  Rosenbrock function: https://en.wikipedia.org/wiki/Rosenbrock_function
+#
 
+using LinearAlgebra
 
 function test_obj_func(vec::Vector)
     return 100*(vec[2]-vec[1]^2)^2 + (1-vec[1])^2
