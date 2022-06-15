@@ -1,3 +1,5 @@
+include("element_func.jl")
+
 abstract type AbstractNode end
 
 mutable struct FunctionNode{T} <: AbstractNode
@@ -13,58 +15,6 @@ mutable struct FunctionNode{T} <: AbstractNode
     FunctionNode(val::T) where T = new{T}(val, zero(val))
 end
 
-function update(node_vec)
-    for i in range(1, length=length(node_vec))
-        if length(node_vec[i].backward) == 1
-            node_vec[i].value = node_vec[i].f(node_vec[i].backward[1].value, node_vec[i].args)
-            node_vec[i].Dp_value = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[1].Dp_value
-            node_vec[i].grad = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[1].grad
-        elseif length(node_vec[i].backward) == 2
-            node_vec[i].value = node_vec[i].f(node_vec[i].backward[1].value, node_vec[i].backward[2].value, node_vec[i].args)
-            node_vec[i].Dp_value = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].backward[2].value, node_vec[i].args)*node_vec[i].backward[1].Dp_value + 
-                                   node_vec[i].f_diff(node_vec[i].backward[2].value, node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[2].Dp_value
-            node_vec[i].grad = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].backward[2].value, node_vec[i].args)*node_vec[i].backward[1].grad + 
-                               node_vec[i].f_diff(node_vec[i].backward[2].value, node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[2].grad
-        end
-    end
-    return node_vec
-end
-
-function power_func(x, args::Tuple)
-    return x^args[1]
-end
-
-function power_diff_func(x, args::Tuple)
-    return args[1]*(x^(args[1]-1))
-end
-
-function multiply_func(x, y, args::Tuple)
-    return x*y   
-end
-
-function multiply_diff_func(x, y, args::Tuple)
-    return y
-end
-
-function add_func(x, args::Tuple)
-    return x+args[1]
-end
-
-function add_diff_func(x, args::Tuple)
-    return 1
-end
-
-add_func(x, y, args::Tuple)=x+y
-
-add_diff_func(x, y, args::Tuple) = 1
-    
-function sacle_func(x, args::Tuple)
-    return args[1]*x
-end
-
-function sacle_diff_func(x, args::Tuple)
-    return args[1]
-end
 
 function initiate(func_vec, diff_func_vec, args_vec, backward_vec, forward_vec)
     node_vec = []
@@ -106,6 +56,24 @@ function initiate(func_vec, diff_func_vec, args_vec, backward_vec, forward_vec)
 end
 
 
+function update(node_vec)
+    for i in range(1, length=length(node_vec))
+        if length(node_vec[i].backward) == 1
+            node_vec[i].value = node_vec[i].f(node_vec[i].backward[1].value, node_vec[i].args)
+            node_vec[i].Dp_value = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[1].Dp_value
+            node_vec[i].grad = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[1].grad
+        elseif length(node_vec[i].backward) == 2
+            node_vec[i].value = node_vec[i].f(node_vec[i].backward[1].value, node_vec[i].backward[2].value, node_vec[i].args)
+            node_vec[i].Dp_value = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].backward[2].value, node_vec[i].args)*node_vec[i].backward[1].Dp_value + 
+                                   node_vec[i].f_diff(node_vec[i].backward[2].value, node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[2].Dp_value
+            node_vec[i].grad = node_vec[i].f_diff(node_vec[i].backward[1].value, node_vec[i].backward[2].value, node_vec[i].args)*node_vec[i].backward[1].grad + 
+                               node_vec[i].f_diff(node_vec[i].backward[2].value, node_vec[i].backward[1].value, node_vec[i].args)*node_vec[i].backward[2].grad
+        end
+    end
+    return node_vec
+end
+
+
 # # y = x1^2+x2^2+x3^2
 # func_vec = [sacle_func, sacle_func, sacle_func, power_func, power_func, power_func, add_func, add_func]
 # diff_func_vec = [sacle_diff_func, sacle_diff_func, sacle_diff_func, power_diff_func, power_diff_func, power_diff_func, add_diff_func, add_diff_func]
@@ -131,7 +99,7 @@ end
 # println(node_vec[8].grad)
 
 
-#  Rosenbrock function
+# Rosenbrock function
 func_vec = [sacle_func, sacle_func, power_func, sacle_func, add_func, power_func, sacle_func, sacle_func, add_func, power_func, add_func]
 diff_vec = [sacle_diff_func, sacle_diff_func, power_diff_func, sacle_diff_func, add_diff_func, power_diff_func, sacle_diff_func, sacle_diff_func, add_diff_func, power_diff_func, add_diff_func]
 args_vec = [(1.0,), (1.0,), (2.0,), (-1.0,), (1.0,), (2.0,), (100.0,), (-1.0,), (1.0,), (2.0,), (1.0,)]
@@ -139,7 +107,6 @@ backward_vec = [(1,), (2,), (1,), (3,), (4,2), (5,), (6,), (1,), (8,), (9,), (10
 forward_vec = [(8,3), (5,), (4,), (5,), (6,), (7,), (11,), (9,), (10,), (11,), (11,)]
 
 node_vec = initiate(func_vec, diff_vec, args_vec, backward_vec, forward_vec)
-
 
 node_vec[1].value = 4.
 node_vec[2].value = 2.
