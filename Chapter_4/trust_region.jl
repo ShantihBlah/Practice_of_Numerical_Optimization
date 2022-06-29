@@ -1,6 +1,7 @@
 using LinearAlgebra
- 
-function trustRegion(object_function::Function, diff_function::Function, hessian_function::Function, x_vec::Vector, max_iter_num::Int; delta_max = 10)
+using ForwardDiff: gradient, hessian
+
+function trustRegion(object_function::Function, x_vec::Vector, max_iter_num::Int; delta_max = 10)
     tolerance = 1e-16
     delta_0 = 0.5 * delta_max
     eta = 0.5 * (1/4)
@@ -10,8 +11,8 @@ function trustRegion(object_function::Function, diff_function::Function, hessian
     for i in range(1, length=max_iter_num)
 
         f_k = object_function(x_vec)
-        g_k = diff_function(x_vec)
-        B_k = hessian_function(x_vec)
+        g_k = gradient(object_function, x_vec)
+        B_k = hessian(object_function, x_vec)
 
         # p_k = cauchyPointCalculation(g_k, delta_k, B_k)
         p_k = dogleg(g_k, B_k, delta_k)
@@ -19,7 +20,7 @@ function trustRegion(object_function::Function, diff_function::Function, hessian
         m_0 = resolveMk(f_k, g_k, B_k, zero_vec)
         m_k = resolveMk(f_k, g_k, B_k, p_k)
         rho_k = (object_function(x_vec)-object_function(x_vec+p_k)) / (m_0 - m_k)
-        println("rho_k: ", rho_k)
+        # println("rho_k: ", rho_k)
 
         if (rho_k < 0.25)
             delta_k = 0.25 * delta_k
@@ -31,7 +32,7 @@ function trustRegion(object_function::Function, diff_function::Function, hessian
         if (rho_k > eta)
             x_vec = x_vec+p_k
         end
-        diff_value = norm(diff_function(x_vec))
+        diff_value = norm(gradient(object_function, x_vec))
         if (diff_value < tolerance)
             break
         end

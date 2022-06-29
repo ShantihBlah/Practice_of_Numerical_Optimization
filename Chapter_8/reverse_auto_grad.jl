@@ -72,20 +72,20 @@ function grad_update(node_vec)
         if grad_index == length(node_vec)
             continue
         end
-        except_grad = 0.0
+        expect_grad = 0.0
         for j in range(1, length=length(node_vec[grad_index].forward))
             next_node = node_vec[node_vec[grad_index].forward[j]]
             if length(next_node.backward) == 1
-                except_grad += next_node.grad * next_node.f_diff(node_vec[grad_index].value, next_node.args)
+                expect_grad += next_node.grad * next_node.f_diff(node_vec[grad_index].value, next_node.args)
             else
                 if node_vec[grad_index].value == next_node.backward[1].value
-                    except_grad += next_node.grad * next_node.f_diff(next_node.backward[1].value, next_node.backward[2].value, next_node.args)
+                    expect_grad += next_node.grad * next_node.f_diff(next_node.backward[1].value, next_node.backward[2].value, next_node.args)
                 else
-                    except_grad += next_node.grad * next_node.f_diff(next_node.backward[2].value, next_node.backward[1].value, next_node.args)
+                    expect_grad += next_node.grad * next_node.f_diff(next_node.backward[2].value, next_node.backward[1].value, next_node.args)
                 end
             end
         end
-        node_vec[grad_index].grad = except_grad
+        node_vec[grad_index].grad = expect_grad
     end
     return node_vec
 end
