@@ -1,34 +1,18 @@
 using LinearAlgebra
+using Random
 
+dim = 50
 
 function quadratic(vec::Vector)
-    A = [1. 0. 2.; 1. 2. 0.; 5. 0. 2.]
+    rng = MersenneTwister(1234)
+    A = randexp(rng, dim, dim)
+    # A = [1. 0. 2.; 1. 2. 0.; 5. 0. 2.]
     Q = A * Transpose(A)
     result = 0.5*transpose(vec)*Q*vec
     return result
 end
 
-test_vec = [10.;4.;2.]
-init_y = quadratic(test_vec)
+init_vec = 5.0*ones(dim)
+# init_vec = [10.;4.;2.]
 
-# function test_obj_func(vec::Vector)
-#     A = [1. 0. 2.; 1. 2. 0.; 5. 0. 2.]
-#     Q = A * Transpose(A)
-#     return 0.5*transpose(vec)*Q*vec
-# end
-
-
-# function test_diff_func(vec::Vector)
-#     A = [1. 0. 2.; 1. 2. 0.; 5. 0. 2.]
-#     Q = A * Transpose(A)
-#     return Q*vec
-# end
-
-# function test_Hessian(vec::Vector)
-#     A = [1. 0. 2.; 1. 2. 0.; 5. 0. 2.]
-#     Q = A * Transpose(A)
-#     return Q
-# end
-
-# test_vec = [10.;4.;2.]
-# init_y = test_obj_func(test_vec)
+quadratic_setup = Dict("obj_func" => quadratic, "init_vec" => init_vec)

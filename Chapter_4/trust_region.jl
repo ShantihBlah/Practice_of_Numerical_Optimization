@@ -1,13 +1,12 @@
 using LinearAlgebra
 using ForwardDiff: gradient, hessian
 
-function trustRegion(object_function::Function, x_vec::Vector, max_iter_num::Int; delta_max = 10)
+function trustRegion(object_function::Function, x_vec::Vector, max_iter_num::Int; delta_max::Int = 10)
     tolerance = 1e-16
     delta_0 = 0.5 * delta_max
     eta = 0.5 * (1/4)
     delta_k = delta_0
     zero_vec = zeros(size(x_vec)[1])
-    println(zero_vec)
     for i in range(1, length=max_iter_num)
 
         f_k = object_function(x_vec)
@@ -17,10 +16,11 @@ function trustRegion(object_function::Function, x_vec::Vector, max_iter_num::Int
         # p_k = cauchyPointCalculation(g_k, delta_k, B_k)
         p_k = dogleg(g_k, B_k, delta_k)
 
+        y_xk =  object_function(x_vec)
+        y_xk_pk = object_function(x_vec+p_k)
         m_0 = resolveMk(f_k, g_k, B_k, zero_vec)
         m_k = resolveMk(f_k, g_k, B_k, p_k)
-        rho_k = (object_function(x_vec)-object_function(x_vec+p_k)) / (m_0 - m_k)
-        # println("rho_k: ", rho_k)
+        rho_k = (y_xk-y_xk_pk) / (m_0 - m_k)
 
         if (rho_k < 0.25)
             delta_k = 0.25 * delta_k

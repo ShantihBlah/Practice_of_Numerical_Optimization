@@ -1,20 +1,37 @@
+using Random
+
 include("problems/unconstraint/quadratic_func.jl")
-# include("problems/unconstraint/Rosenbrock_func.jl")
+include("problems/unconstraint/Rosenbrock_func.jl")
 
 include("Chapter_3/line_search.jl")
 include("Chapter_4/trust_region.jl")
+include("Chapter_5/conjugate_gradient.jl")
 
+problem_setup = quadratic_setup
+# problem_setup = rosenbrock_setup
 
-test_result = lineSearch(quadratic, test_vec, 100, BK_method="Newtown")
-y_value = quadratic(test_result)
+object_function = problem_setup["obj_func"]
+init_vec = problem_setup["init_vec"]
+init_y = object_function(init_vec)
+max_iter_num = 2000
 
-# test_result = trustRegion(quadratic, test_vec, 100, delta_max=20)
-# y_value = quadratic(test_result)
+@time solution_vec = lineSearch(object_function, init_vec, max_iter_num, BK_method="Speedest_Descend")
+# @time solution_vec = trustRegion(object_function, init_vec, max_iter_num, delta_max=20)
 
-# test_result = trustRegion(rosenbrock, test_vec, 100, delta_max=20)
-# y_value = rosenbrock(test_result)
+solution_y = object_function(solution_vec)
 
-println("Initial X: ", test_vec)
+println("Initial X: ", init_vec)
 println("Initial Y: ", init_y)
-println("Final X: ", test_result)
-println("Final Y: ", y_value)
+println("Final X: ", solution_vec)
+println("Final Y: ", solution_y)
+
+
+rng = MersenneTwister(1234)
+
+dim = 50
+B = randexp(rng, dim, dim)
+x = 5.0*ones(dim)
+b = zeros(dim)
+A = (Transpose(B) * B)
+
+@time x = conjugate_gradient(A, x, b)

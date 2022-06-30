@@ -14,24 +14,8 @@ function rosenbrock(x)
     return result
 end
 
-test_vec = [4.;2.]
-init_y = rosenbrock(test_vec)
+# init_vec = [4.;2.]
+init_vec = [4.;2.;2.;5.;8.;1.;3.;-1.;2.;-4.]
+# init_vec = rand(20)
 
-
-# function test_obj_func(vec::Vector)
-#     return 100*(vec[2]-vec[1]^2)^2 + (1-vec[1])^2
-# end
-
-
-# function test_diff_func(vec::Vector)
-#     diff_vec = [400*vec[1]*(vec[1]^2-vec[2]) + 2*(vec[1]-1); 200*(vec[2]-vec[1]^2)]
-#     return diff_vec
-# end
-
-# function test_Hessian(vec::Vector)
-#     Q = [400*(3*vec[1]^2-vec[2])+2 -400*vec[1]; -400*vec[1] 200]
-#     return Q
-# end
-
-# test_vec = [4.;2.]
-# init_y = test_obj_func(test_vec)
+rosenbrock_setup = Dict("obj_func" => rosenbrock, "init_vec" => init_vec)
