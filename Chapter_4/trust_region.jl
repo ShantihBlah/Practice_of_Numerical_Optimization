@@ -7,11 +7,16 @@ function trustRegion(object_function::Function, x_vec::Vector, max_iter_num::Int
     eta = 0.5 * (1/4)
     delta_k = delta_0
     zero_vec = zeros(size(x_vec)[1])
+
+    # setup the 1st and 2nd Gradient
+    g = x_vec -> gradient(object_function, x_vec)
+    H = x_vec -> hessian(object_function, x_vec)
+
     for i in range(1, length=max_iter_num)
 
         f_k = object_function(x_vec)
-        g_k = gradient(object_function, x_vec)
-        B_k = hessian(object_function, x_vec)
+        g_k = g(x_vec)
+        B_k = H(x_vec)
 
         # p_k = cauchyPointCalculation(g_k, delta_k, B_k)
         p_k = dogleg(g_k, B_k, delta_k)
@@ -32,7 +37,7 @@ function trustRegion(object_function::Function, x_vec::Vector, max_iter_num::Int
         if (rho_k > eta)
             x_vec = x_vec+p_k
         end
-        diff_value = norm(gradient(object_function, x_vec))
+        diff_value = norm(g(x_vec))
         if (diff_value < tolerance)
             break
         end

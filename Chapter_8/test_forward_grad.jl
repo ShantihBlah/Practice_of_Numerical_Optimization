@@ -1,4 +1,4 @@
-using ForwardDiff: GradientConfig, Chunk, gradient!, hessian
+using ForwardDiff: GradientConfig, Chunk, gradient!, hessian, gradient, hessian
 using LinearAlgebra
 
 function rosenbrock(x)
@@ -37,7 +37,8 @@ function quadratic(vec)
     return result
 end
 
-x = [10.;4.;2.];
+# x = [10.;4.;2.];
+x = [-9.0, 4.2, 8.]
 println(quadratic(x))
 out = similar(x);
 cfg1 = GradientConfig(quadratic, x, Chunk{1}());
@@ -45,3 +46,11 @@ cfg1 = GradientConfig(quadratic, x, Chunk{1}());
 println(gradient!(out, quadratic, x, cfg1))
 hessian_matrix = hessian(quadratic, x)
 println(hessian_matrix)
+
+g = x -> gradient(quadratic,x)
+hessian_x = x -> hessian(quadratic, x)
+
+x = [-9.0, 4.2, 8.]
+
+println(g(x))
+println(hessian_x(x))
