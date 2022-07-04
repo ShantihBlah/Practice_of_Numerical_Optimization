@@ -32,7 +32,7 @@ function lineSearch(object_function::Function, x_vec::Vector, max_iter_num::Int;
 
         # Calculate B_k
         if (BK_method=="BFGS")
-            B_k = BFGS(B_k, x_vec_current, x_vec_previous, g) # BFGS
+            B_k = calculateBFGS_B(B_k, x_vec_current, x_vec_previous, g) # BFGS
         elseif (BK_method=="Newtown")
             B_k = H(x_vec_current) # the Newtown method
         elseif (BK_method=="Speedest_Descend")
@@ -59,7 +59,7 @@ function steepestDescentBkMatrix(x_vec::Vector)
     return Diagonal(temp_vec)
 end
 
-function BFGS(B_k_pre, x_vec::Vector, x_vec_pre::Vector, g::Function)
+function calculateBFGS_B(B_k_pre, x_vec::Vector, x_vec_pre::Vector, g::Function)
     s_k = x_vec - x_vec_pre
     y_k = g(x_vec) - g(x_vec_pre)
     tolerance = 1e-16
