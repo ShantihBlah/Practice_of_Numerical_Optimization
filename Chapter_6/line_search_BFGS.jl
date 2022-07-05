@@ -24,7 +24,10 @@ function lineSearchBFGS(object_function::Function, x_vec::Vector, max_iter_num::
 
         x_vec_previous = x_vec_current
         x_vec_current = x_vec_current + alpha*p_vec
-        diff_value = norm(g(x_vec))
+        diff_value = norm(g(x_vec_current))
+        # println("diff_value: ", diff_value)
+        # println("x_value: ", x_vec_current[1])
+        # println("y_value: ", object_function(x_vec_current))
         if diff_value < tolerance
             break
         end

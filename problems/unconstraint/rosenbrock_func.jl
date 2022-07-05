@@ -15,7 +15,7 @@ function rosenbrock(x)
 end
 
 # rosenbrock_init_vec = [4.;2.]
-rosenbrock_init_vec = [4.;2.;2.;5.;8.;1.;3.;-1.;2.;-4.]
-# rosenbrock_init_vec = rand(20)
+# rosenbrock_init_vec = [4.;2.;2.;5.;8.;1.;3.;-1.;2.;-4.]
+rosenbrock_init_vec = 5.0*ones(1000)
 
 rosenbrock_setup = Dict("obj_func" => rosenbrock, "init_vec" => rosenbrock_init_vec)
